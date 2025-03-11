@@ -1,11 +1,5 @@
 /**
  * Author - Harun Cakir
- * 
- * matrix.h - SIMD-optimized matrix operations using both AVX and NEON
- * 
- * This header provides a Matrix data structure and operations optimized for
- * SIMD instructions on both x86 (AVX) and ARM (NEON) architectures.
- * Added OpenMP parallelization for multi-core systems.
  */
 
 /**
@@ -23,13 +17,6 @@
 There should be NO unnecessary library dependency.
 */
 #include "def.h"
-
-typedef struct {
-    size_t row;
-    size_t col;
-    float *data; /* keep in mind: NVIDIA GPUs with tensor cores and
-                    many deep learning models can tolerate reduced precision (float16) */
-} mat_t;
 
 /*
 Assume that I have 4x3 matrix

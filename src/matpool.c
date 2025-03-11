@@ -1,5 +1,6 @@
 #include "matpool.h"
 
+
 /* Utility function to align memory addresses */
 static size_t align_size(size_t size) {
     /* Align to 8-byte boundary for better memory access on most platforms */

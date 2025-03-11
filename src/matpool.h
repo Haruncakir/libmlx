@@ -2,7 +2,6 @@
 #define MATPOOL_H
 
 #include "def.h"
-#include "matrix.h"
 
 /*
 (Region-based memory management)
