@@ -6,7 +6,7 @@ static size_t align_size(size_t size) {
     return (size + 7) & ~7;
 }
 mat_status_t reginit(mat_region_t *reg, void *memory, size_t size) {
-    if (!reg | !memory | size == 0)
+    if (!reg || !memory || size == 0)
         return MATRIX_NULL_POINTER;
     reg->memory = (unsigned char *)memory;
     reg->size = size;
@@ -38,7 +38,7 @@ static void *regalloc(mat_region_t *reg, size_t size) {
 }
 
 mat_status_t matalloc(mat_region_t *reg, size_t rows, size_t cols, mat_t __OUTPUT *mat) {
-    if (!reg | !mat)
+    if (!reg || !mat)
         return MATRIX_NULL_POINTER;
     if (rows == 0 || cols == 0)
         return MATRIX_DIMENSION_MISMATCH;
@@ -71,10 +71,11 @@ mat_status_t matcreate(mat_region_t *reg,
         for (; i < total_elems; ++i)
             mat->data[i] = data[i];
     }
+    return MATRIX_SUCCESS;
 }
 
 mat_status_t matresalloc(mat_region_t *reg, const mat_t __INPUT *A,
-                        const mat_t __INPUT *B, const mat_t __OUTPUT *C) {
+                        const mat_t __INPUT *B, mat_t __OUTPUT *C) {
     if (!A || !B || !C)
         return MATRIX_NULL_POINTER;
     

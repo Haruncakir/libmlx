@@ -24,7 +24,7 @@ mat_status_t matalloc(mat_region_t *reg, size_t rows, size_t cols, mat_t __OUTPU
 mat_status_t matcreate(mat_region_t *reg, size_t rows, size_t cols, 
                         const float __NULLABLE *data, mat_t *mat);
 mat_status_t matresalloc(mat_region_t *reg, const mat_t __INPUT *A,
-                        const mat_t __INPUT *B, const mat_t __OUTPUT *C);
+                        const mat_t __INPUT *B, mat_t __OUTPUT *C);
 const char *strmaterr(mat_status_t stat);
 
 #endif // MATPOOL_H

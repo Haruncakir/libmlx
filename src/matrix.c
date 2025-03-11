@@ -34,9 +34,9 @@ mat_status_t matemul(const mat_t *A, const mat_t *B, mat_t *C) {
         C->row != A->row || C->col != A->col)
         return MATRIX_DIMENSION_MISMATCH;
     
-    size_t total_elements = A->row * A->col;
+    size_t total_elements = A->row * A->col, i = 0;
     
-    for (size_t i = 0; i < total_elements; i++) {
+    for (; i < total_elements; i++) {
         C->data[i] = A->data[i] * B->data[i];
     }
     
@@ -64,7 +64,8 @@ mat_status_t matdot(const mat_t *A, const mat_t *B, mat_t *C) {
         return MATRIX_DIMENSION_MISMATCH;
     
     float sum = 0.0f;
-    for (size_t i = 0; i < len_a; i++) {
+    size_t i = 0;
+    for (; i < len_a; i++) {
         sum += A->data[i] * B->data[i];
     }
     
@@ -86,9 +87,9 @@ mat_status_t matadd(const mat_t *A, const mat_t *B, mat_t *C) {
         C->row != A->row || C->col != A->col)
         return MATRIX_DIMENSION_MISMATCH;
     
-    size_t total_elements = A->row * A->col;
+    size_t total_elements = A->row * A->col, i = 0;
     
-    for (size_t i = 0; i < total_elements; i++) {
+    for (; i < total_elements; i++) {
         C->data[i] = A->data[i] + B->data[i];
     }
     
