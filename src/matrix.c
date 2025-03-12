@@ -25,7 +25,7 @@ mat_status_t matmul(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTP
  * Element-wise multiplication: C = A ⊙ B
  * A, B, and C must have the same dimensions
  */
-mat_status_t matemul(const mat_t *A, const mat_t *B, mat_t *C) {
+mat_status_t matemul(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTPUT *C) {
     if (!A || !B || !C)
         return MATRIX_NULL_POINTER;
     
@@ -48,7 +48,7 @@ mat_status_t matemul(const mat_t *A, const mat_t *B, mat_t *C) {
  * A and B must be vectors of the same length
  * C is a 1x1 matrix (scalar)
  */
-mat_status_t matdot(const mat_t *A, const mat_t *B, mat_t *C) {
+mat_status_t matdot(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTPUT *C) {
     if (!A || !B || !C)
         return MATRIX_NULL_POINTER;
     
@@ -78,7 +78,7 @@ mat_status_t matdot(const mat_t *A, const mat_t *B, mat_t *C) {
  * Matrix addition: C = A + B
  * A, B, and C must have the same dimensions
  */
-mat_status_t matadd(const mat_t *A, const mat_t *B, mat_t *C) {
+mat_status_t matadd(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTPUT *C) {
     if (!A || !B || !C)
         return MATRIX_NULL_POINTER;
     

@@ -76,7 +76,7 @@
  * that variables declared on the stack are also properly aligned.
  */
 
-#ifdef ENABLE_SIMD // ???
+// #ifdef ENABLE_SIMD // ???
 #ifdef __AVX__
 #include <immintrin.h>
 #define SIMD_ENABLED
@@ -105,7 +105,23 @@
 #define ALIGNED __attribute__((aligned(ALIGN_BOUNDARY)))
 #endif
 
-#endif // ENABLE_SIMD
+// #endif // ENABLE_SIMD
+
+/* from stdint.h */
+/* Types for `void *' pointers.  */
+#if __WORDSIZE == 64
+# ifndef __intptr_t_defined
+typedef long int		intptr_t;
+#  define __intptr_t_defined
+# endif
+typedef unsigned long int	uintptr_t;
+#else
+# ifndef __intptr_t_defined
+typedef int			intptr_t;
+#  define __intptr_t_defined
+# endif
+typedef unsigned int		uintptr_t;
+#endif
 
 /*
 Add GPU acceleration support since Rasberry pi 5 can be modified to work with GPUs 
@@ -114,8 +130,9 @@ Add GPU acceleration support since Rasberry pi 5 can be modified to work with GP
 typedef struct {
     size_t row;
     size_t col;
-    float *data; /* keep in mind: NVIDIA GPUs with tensor cores and
-                    many deep learning models can tolerate reduced precision (float16) */
+    size_t stride; /* Stride between rows (for padding) */
+    float *data;   /* keep in mind: NVIDIA GPUs with tensor cores and
+                      many deep learning models can tolerate reduced precision (float16) */
 } mat_t;
 
 #define __INPUT  

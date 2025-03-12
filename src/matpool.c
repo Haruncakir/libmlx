@@ -1,11 +1,26 @@
 #include "matpool.h"
 
-
-/* Utility function to align memory addresses */
+/* 
+ * Utility function to align memory addresses to SIMD boundary
+ * This ensures proper alignment for AVX (32-byte), NEON (16-byte),
+ * or standard float (4-byte) operations depending on architecture.
+ */
 static size_t align_size(size_t size) {
-    /* Align to 8-byte boundary for better memory access on most platforms */
-    return (size + 7) & ~7;
+    return (size + (ALIGN_BOUNDARY - 1)) & ~(ALIGN_BOUNDARY - 1);
 }
+
+/* 
+ * Utility function to check and align a pointer address
+ * Returns the next aligned address from the given pointer
+ */
+static unsigned char* align_ptr(unsigned char* ptr) {
+    uintptr_t addr = (uintptr_t)ptr;
+    uintptr_t aligned = (addr + (ALIGN_BOUNDARY - 1)) & ~(ALIGN_BOUNDARY - 1);
+    return (unsigned char*)aligned;
+}
+
+/* TODO: adjust remainings */
+
 mat_status_t reginit(mat_region_t *reg, void *memory, size_t size) {
     if (!reg || !memory || size == 0)
         return MATRIX_NULL_POINTER;
