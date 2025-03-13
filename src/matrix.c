@@ -1,7 +1,7 @@
 #include "matrix.h"
 
 // TODO: optimize for SIMD instructions.
-
+/*
 mat_status_t matmul(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTPUT *C) {
     if (!A || !B || !C)
         return MATRIX_NULL_POINTER;
@@ -21,10 +21,6 @@ mat_status_t matmul(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTP
     return MATRIX_SUCCESS;
 }
 
-/**
- * Element-wise multiplication: C = A ⊙ B
- * A, B, and C must have the same dimensions
- */
 mat_status_t matemul(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTPUT *C) {
     if (!A || !B || !C)
         return MATRIX_NULL_POINTER;
@@ -43,11 +39,6 @@ mat_status_t matemul(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUT
     return MATRIX_SUCCESS;
 }
 
-/**
- * Dot product: C = A · B
- * A and B must be vectors of the same length
- * C is a 1x1 matrix (scalar)
- */
 mat_status_t matdot(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTPUT *C) {
     if (!A || !B || !C)
         return MATRIX_NULL_POINTER;
@@ -74,10 +65,6 @@ mat_status_t matdot(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTP
     return MATRIX_SUCCESS;
 }
 
-/**
- * Matrix addition: C = A + B
- * A, B, and C must have the same dimensions
- */
 mat_status_t matadd(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTPUT *C) {
     if (!A || !B || !C)
         return MATRIX_NULL_POINTER;
@@ -95,3 +82,4 @@ mat_status_t matadd(const mat_t __INPUT *A, const mat_t __INPUT *B, mat_t __OUTP
     
     return MATRIX_SUCCESS;
 }
+*/

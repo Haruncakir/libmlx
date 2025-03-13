@@ -1,9 +1,9 @@
-#ifndef DEF_H
-#define DEF_H
+#ifndef MATRIX_CONFIG_H
+#define MATRIX_CONFIG_H
 
 /*
- * Memory Alignment Explanation
- * ----------------------------
+ * Memory Alignment 
+ * -----------------
  * 
  * Memory alignment refers to the way data is arranged and accessed in computer memory.
  * The ALIGN_BOUNDARY defines how many bytes your data should be aligned to in memory.
@@ -76,79 +76,54 @@
  * that variables declared on the stack are also properly aligned.
  */
 
-// #ifdef ENABLE_SIMD // ???
-#ifdef __AVX__
-#include <immintrin.h>
-#define SIMD_ENABLED
-#define VECTOR_SIZE 8  // AVX uses 256-bit vectors (8 floats or 4 doubles)
-#elif defined(__ARM_NEON)
-#include <arm_neon.h>
-#define SIMD_ENABLED
-#define VECTOR_SIZE 4  // NEON uses 128-bit vectors (4 floats or 2 doubles)
+#if defined(__AVX__) || defined(__AVX2__)
+    #define MAT_USE_AVX 1
+    #define SIMD_ALIGN 32
+    #define FLOAT_PER_VECTOR 8  /* 8 floats in 256-bit AVX register */
+#elif defined(__ARM_NEON) || defined(__ARM_NEON__)
+    #define MAT_USE_NEON 1
+    #define SIMD_ALIGN 16
+    #define FLOAT_PER_VECTOR 4  /* 4 floats in 128-bit NEON register */
 #else
-#define VECTOR_SIZE 1  // Fallback to scalar operations
+    #define MAT_USE_SCALAR 1
+    #define SIMD_ALIGN 4
+    #define FLOAT_PER_VECTOR 1
 #endif
 
-// Align to SIMD vector boundary
-#ifdef __AVX__
-#define ALIGN_BOUNDARY 32  // AVX 256-bit alignment
-#elif defined(__ARM_NEON)
-#define ALIGN_BOUNDARY 16  // NEON 128-bit alignment
-#else
-#define ALIGN_BOUNDARY 4   // Regular float alignment
+/* manual overrides */
+#ifdef MAT_FORCE_SCALAR
+    #undef MAT_USE_AVX
+    #undef MAT_USE_NEON
+    #define MAT_USE_SCALAR 1
+    #define SIMD_ALIGN 4
+    #define FLOAT_PER_VECTOR 1
 #endif
 
-// Alignment macro
+/* platform-specific alignment macros */
 #ifdef _MSC_VER
-#define ALIGNED __declspec(align(ALIGN_BOUNDARY))
+    #define MAT_ALIGN __declspec(align(SIMD_ALIGN))
 #else
-#define ALIGNED __attribute__((aligned(ALIGN_BOUNDARY)))
+    #define MAT_ALIGN __attribute__((aligned(SIMD_ALIGN)))
 #endif
 
-// #endif // ENABLE_SIMD
-
-/* from stdint.h */
-/* Types for `void *' pointers.  */
-#if __WORDSIZE == 64
-# ifndef __intptr_t_defined
-typedef long int		intptr_t;
-#  define __intptr_t_defined
-# endif
-typedef unsigned long int	uintptr_t;
+/* function attributes */
+#define MAT_INLINE static inline
+#ifdef __GNUC__ /* to inform the compiler about the expected outcome of a condition */
+    #define MAT_LIKELY(x) __builtin_expect(!!(x), 1)
+    #define MAT_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #else
-# ifndef __intptr_t_defined
-typedef int			intptr_t;
-#  define __intptr_t_defined
-# endif
-typedef unsigned int		uintptr_t;
+    #define MAT_LIKELY(x) (x)
+    #define MAT_UNLIKELY(x) (x)
 #endif
 
-/*
-Add GPU acceleration support since Rasberry pi 5 can be modified to work with GPUs 
-*/
+/* Threading model - default to single-threaded for embedded */
+#ifndef MAT_MULTI_THREADED
+    #define MAT_MULTI_THREADED 0
+#endif
 
-typedef struct {
-    size_t row;
-    size_t col;
-    size_t stride; /* Stride between rows (for padding) */
-    float *data;   /* keep in mind: NVIDIA GPUs with tensor cores and
-                      many deep learning models can tolerate reduced precision (float16) */
-} mat_t;
+/* memory allocation strategy */
+#ifndef MAT_USE_MALLOC
+    #define MAT_USE_MALLOC 0  /* Default to not using dynamic allocation */
+#endif
 
-#define __INPUT  
-#define __OUTPUT  
-#define __NULLABLE
-
-typedef __SIZE_TYPE__ size_t;
-typedef unsigned char mat_status_t;
-
-/* Matrix status list */
-#define MATRIX_SUCCESS              ((mat_status_t)0)
-#define MATRIX_NOT_INITIALIZED      ((mat_status_t)1)
-#define MATRIX_NULL_POINTER         ((mat_status_t)2)
-#define MATRIX_REGION_FULL          ((mat_status_t)3)
-#define MATRIX_INVALID_REGION       ((mat_status_t)4)
-#define MATRIX_DIMENSION_MISMATCH   ((mat_status_t)5)
-// ...
-
-#endif // DEF_H
+#endif // MATRIX_CONFIG_H
