@@ -256,4 +256,36 @@ mat_status_t matvecmul(const mat_t MAT_IN *a, const float MAT_IN *x, float MAT_O
     return MATRIX_SUCCESS;
 }
 
+mat_status_t matreshape(mat_t MAT_INOUT *a, size_t new_row, size_t new_col) {
+    if (!a) {
+        return MATRIX_NULL_POINTER;
+    }
+    
+    // Check that the total number of elements remains the same
+    if (a->row * a->col != new_row * new_col) {
+        return MATRIX_DIMENSION_MISMATCH;
+    }
+    
+    // Calculate new stride based on new column count
+    size_t new_stride = new_col;
+    if (new_col % (SIMD_ALIGN / sizeof(float)) != 0) {
+        new_stride = ((new_col / (SIMD_ALIGN / sizeof(float))) + 1) * (SIMD_ALIGN / sizeof(float));
+    }
+    
+    // If the current stride is sufficient for the new dimensions
+    // (this is a common case when we're just reinterpreting the shape)
+    if (new_stride <= a->stride) {
+        a->row = new_row;
+        a->col = new_col;
+        // Keep the existing stride to maintain alignment
+        return MATRIX_SUCCESS;
+    }
+    
+    // If we get here, we need to rearrange the data to handle the new stride
+    // This is more complex and would require copying the data
+    // For embedded systems, it's typically better to create a new matrix
+    // with the correct dimensions rather than trying to reshape in-place
+    return MATRIX_UNSUPPORTED_OPERATION;
+}
+
 // #endif

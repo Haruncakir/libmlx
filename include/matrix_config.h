@@ -6,7 +6,7 @@
  * -----------------
  * 
  * Memory alignment refers to the way data is arranged and accessed in computer memory.
- * The ALIGN_BOUNDARY defines how many bytes your data should be aligned to in memory.
+ * The SIMD_ALIGN defines how many bytes your data should be aligned to in memory.
  * 
  * AVX (32-byte alignment)
  * -----------------------
@@ -114,6 +114,22 @@
 #else
     #define MAT_LIKELY(x) (x)
     #define MAT_UNLIKELY(x) (x)
+#endif
+
+/* from stdint.h */
+/* Types for `void *' pointers.  */
+#if __WORDSIZE == 64
+# ifndef __intptr_t_defined
+typedef long int		intptr_t;
+#  define __intptr_t_defined
+# endif
+typedef unsigned long int	uintptr_t;
+#else
+# ifndef __intptr_t_defined
+typedef int			intptr_t;
+#  define __intptr_t_defined
+# endif
+typedef unsigned int		uintptr_t;
 #endif
 
 /* Threading model - default to single-threaded for embedded */
