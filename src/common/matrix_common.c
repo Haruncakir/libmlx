@@ -1,5 +1,5 @@
-#include "matrix_config.h"
-#include "matrix.h"
+#include "../../include/matrix/matpool.h"
+#include "../../include/matrix/matrix_config.h"
 
 float matget(const mat_t *m, size_t row, size_t col) {
     if (!m || row >= m->row || col >= m->col) {

@@ -1,5 +1,5 @@
-#include "../../include/matpool.h"
-#include "../../include/matrix_config.h"
+#include "../../include/matrix/matpool.h"
+#include "../../include/matrix/matrix_config.h"
 
 /* 
  * Utility function to align memory addresses to SIMD boundary

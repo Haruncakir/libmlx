@@ -1,5 +1,5 @@
-#include "matrix_config.h"
-#include "matrix.h"
+#include "../../../include/matrix/matrix_config.h"
+#include "../../../include/matrix/matrix.h"
 
 // #if defined(MAT_USE_AVX)
 #include <immintrin.h>

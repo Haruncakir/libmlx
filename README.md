@@ -1,6 +1,11 @@
 # libmlx
 ---
 ## Embedded Machine Learning Library
+### Things on My Mind
+---
+- Explain codes (as much as literate programming requires)
+- Memory pools are matrix specific. ML models will require extra space for other computations
+- Multiclass logistic regression can be too computationally heavy. 
 
 ## Embedded SIMD Matrix Library
 
