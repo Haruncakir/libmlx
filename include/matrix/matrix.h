@@ -1,9 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-/*
-There should be NO unnecessary library dependency.
-*/
+#include "matpool.h"
 
 typedef struct {
     size_t row;
@@ -57,7 +55,11 @@ mat_status_t matsub       (const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t M
 mat_status_t matmul       (const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT *c);
 mat_status_t matvecmul    (const mat_t MAT_IN *a, const float MAT_IN *x, float MAT_OUT *y);
 mat_status_t mattranspose (const mat_t MAT_IN *a,                        mat_t MAT_OUT *b);
-mat_status_t matreshape   (const mat_t MAT_INOUT *a, size_t row, size_t col);
+mat_status_t matreshape   (const mat_t MAT_IN *a, size_t row, size_t col, mat_t MAT_OUT *b);
+mat_status_t matreshapeip (const mat_t MAT_INOUT *a, size_t row, size_t col);
+mat_status_t matreshapeblock(const mat_t MAT_IN *a, size_t row, size_t col, mat_t MAT_OUT *b);
+mat_status_t matreshapereg(mat_region_t *reg, const mat_t MAT_IN *a, 
+                               size_t row, size_t col, mat_t MAT_OUT *b);
 float        matdot       (const float *a,        const float *b,        size_t length);
 
 /* Common utility functions - same implementation for all architectures */
@@ -67,7 +69,7 @@ mat_status_t matfill      (mat_t *m, float value);
 float*       matrowptr    (mat_t *m, size_t row);
 mat_status_t matcopy      (const mat_t *src, mat_t *dst);
 mat_status_t matidentity  (mat_t *m);
-float        matnorm      (const mat_t *m)
+float        matnorm      (const mat_t *m);
 // void matprint(const mat_t *m);
 
 #endif // MATRIX_H

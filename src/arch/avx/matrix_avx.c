@@ -256,7 +256,7 @@ mat_status_t matvecmul(const mat_t MAT_IN *a, const float MAT_IN *x, float MAT_O
     return MATRIX_SUCCESS;
 }
 
-mat_status_t matreshape(mat_t MAT_INOUT *a, size_t new_row, size_t new_col) {
+mat_status_t matreshapeip(mat_t MAT_INOUT *a, size_t new_row, size_t new_col) {
     if (!a) {
         return MATRIX_NULL_POINTER;
     }
@@ -286,6 +286,170 @@ mat_status_t matreshape(mat_t MAT_INOUT *a, size_t new_row, size_t new_col) {
     // For embedded systems, it's typically better to create a new matrix
     // with the correct dimensions rather than trying to reshape in-place
     return MATRIX_UNSUPPORTED_OPERATION;
+}
+
+/**
+ * @brief Reshape a matrix to new dimensions and store in a different matrix
+ * 
+ * This function copies data from matrix 'a' to matrix 'b' with new dimensions,
+ * preserving the data in row-major order. The matrix 'b' should be allocated
+ * using matalloc or matcreate before calling this function.
+ * 
+ * This version is optimized for embedded systems with limited memory.
+ * 
+ * @param a Input matrix
+ * @param row New row count
+ * @param col New column count
+ * @param b Output matrix (must be pre-allocated with proper dimensions)
+ * @return mat_status_t Status code
+ */
+mat_status_t matreshape(const mat_t MAT_IN *a, size_t row, size_t col, mat_t MAT_OUT *b) {
+    // Validate input parameters
+    if (!a || !b) {
+        return MATRIX_NULL_POINTER;
+    }
+    
+    // Check that total element count matches
+    if (a->row * a->col != row * col) {
+        return MATRIX_DIMENSION_MISMATCH;
+    }
+    
+    // Check if the destination matrix has the right dimensions
+    if (b->row != row || b->col != col) {
+        return MATRIX_DIMENSION_MISMATCH;
+    }
+    
+    // Direct element-by-element copy with logical index tracking
+    size_t total_elements = a->row * a->col;
+    
+    // Use direct indexing without temporary storage
+    for (size_t idx = 0; idx < total_elements; idx++) {
+        // Calculate source coordinates
+        size_t a_row = idx / a->col;
+        size_t a_col = idx % a->col;
+        
+        // Calculate destination coordinates
+        size_t b_row = idx / col;
+        size_t b_col = idx % col;
+        
+        // Copy the element with stride handling
+        b->data[b_row * b->stride + b_col] = a->data[a_row * a->stride + a_col];
+    }
+    
+    return MATRIX_SUCCESS;
+}
+
+/**
+ * @brief Reshape with support for region allocation
+ * 
+ * This version of reshape creates a new matrix with the specified dimensions
+ * in the provided memory region, and copies the data from the source matrix.
+ * Optimized for memory-constrained embedded systems.
+ * 
+ * @param reg Memory region for allocation
+ * @param a Input matrix
+ * @param row New row count
+ * @param col New column count
+ * @param b Output matrix (will be allocated in the region)
+ * @return mat_status_t Status code
+ */
+mat_status_t matreshapereg(mat_region_t *reg, const mat_t MAT_IN *a, 
+                               size_t row, size_t col, mat_t MAT_OUT *b) {
+    if (!reg || !a || !b) {
+        return MATRIX_NULL_POINTER;
+    }
+    
+    // Check that total element count matches
+    if (a->row * a->col != row * col) {
+        return MATRIX_DIMENSION_MISMATCH;
+    }
+    
+    // Allocate the destination matrix in the provided region
+    mat_status_t status = matalloc(reg, row, col, b);
+    if (status != MATRIX_SUCCESS) {
+        return status;
+    }
+    
+    // Use direct indexing without temporary storage
+    size_t total_elements = a->row * a->col;
+    for (size_t idx = 0; idx < total_elements; idx++) {
+        // Calculate source coordinates
+        size_t a_row = idx / a->col;
+        size_t a_col = idx % a->col;
+        
+        // Calculate destination coordinates
+        size_t b_row = idx / col;
+        size_t b_col = idx % col;
+        
+        // Copy the element with stride handling
+        b->data[b_row * b->stride + b_col] = a->data[a_row * a->stride + a_col];
+    }
+    
+    return MATRIX_SUCCESS;
+}
+
+/**
+ * @brief Block-based matrix reshape for better memory efficiency
+ * 
+ * This version processes small blocks at a time to maintain cache efficiency
+ * while avoiding large temporary buffers. Suitable for embedded systems.
+ * 
+ * @param a Input matrix
+ * @param row New row count
+ * @param col New column count
+ * @param b Output matrix (must be pre-allocated with proper dimensions)
+ * @return mat_status_t Status code
+ */
+mat_status_t matreshapeblock(const mat_t MAT_IN *a, size_t row, size_t col, mat_t MAT_OUT *b) {
+    // Validate input parameters
+    if (!a || !b) {
+        return MATRIX_NULL_POINTER;
+    }
+    
+    // Check that total element count matches
+    if (a->row * a->col != row * col) {
+        return MATRIX_DIMENSION_MISMATCH;
+    }
+    
+    // Check if the destination matrix has the right dimensions
+    if (b->row != row || b->col != col) {
+        return MATRIX_DIMENSION_MISMATCH;
+    }
+    
+    // Small fixed-size buffer for better cache efficiency
+    // 16 floats is a reasonable compromise between cache efficiency and memory usage
+    // Adjust the size based on your target platform's constraints
+    const size_t BLOCK_SIZE = 16;
+    float block_buffer[BLOCK_SIZE];
+    
+    size_t total_elements = a->row * a->col;
+    size_t elements_processed = 0;
+    
+    while (elements_processed < total_elements) {
+        // Determine block size for this iteration
+        size_t current_block_size = (total_elements - elements_processed < BLOCK_SIZE) ? 
+                                   (total_elements - elements_processed) : BLOCK_SIZE;
+        
+        // Fill the buffer with a block of elements
+        for (size_t i = 0; i < current_block_size; i++) {
+            size_t idx = elements_processed + i;
+            size_t a_row = idx / a->col;
+            size_t a_col = idx % a->col;
+            block_buffer[i] = a->data[a_row * a->stride + a_col];
+        }
+        
+        // Write the buffer to the destination matrix
+        for (size_t i = 0; i < current_block_size; i++) {
+            size_t idx = elements_processed + i;
+            size_t b_row = idx / col;
+            size_t b_col = idx % col;
+            b->data[b_row * b->stride + b_col] = block_buffer[i];
+        }
+        
+        elements_processed += current_block_size;
+    }
+    
+    return MATRIX_SUCCESS;
 }
 
 // #endif
