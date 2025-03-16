@@ -7,6 +7,36 @@
     typedef unsigned int __attribute__((mode(SI))) uint32_t;
 #endif
 
+uint32_t seed = 123456789; // Initial seed value
+
+// Function to set the seed
+void mlxsetseedrand(uint32_t new_seed) {
+    seed = new_seed;
+}
+
+// Function to generate the next random number using inline assembly
+unsigned int mlxlcgrand() {
+    uint32_t a = 1664525; // Multiplier
+    uint32_t c = 1013904223; // Increment
+    uint32_t m = 0xFFFFFFFF; // Modulus (2^32)
+
+    uint32_t next_seed;
+
+    // Inline assembly to perform the LCG calculation
+    asm (
+        "mov %[seed], %%eax;"        // Load seed into EAX
+        "imul %[a], %%eax;"          // EAX = EAX * a
+        "add %[c], %%eax;"           // EAX = EAX + c
+        "mov %%eax, %[next_seed];"   // Store result in next_seed
+        "and %[m], %[next_seed];"    // Apply modulus
+        : [next_seed] "=r" (next_seed) // Output
+        : [seed] "r" (seed), [a] "r" (a), [c] "r" (c), [m] "r" (m) // Inputs
+        : "%eax" // Clobbered register
+    );
+
+    seed = next_seed; // Update the seed
+    return next_seed; // Return the random number
+}
 
 /**
  * @brief Custom implementation of exponential function

@@ -4,18 +4,18 @@
 #include "matrix/matrix.h"
 #include "matrix/matpool.h"
 
-typedef unsigned char logistic_status_t;
+typedef unsigned char mlxlogistic_status_t;
 typedef enum {
     false,
     true
 } bool; 
 
-#define LOGISTIC_SUCCESS ((logistic_status_t)0)
-#define LOGISTIC_NULL_POINTER ((logistic_status_t)1)
-#define LOGISTIC_DIMENSION_MISMATCH ((logistic_status_t)2)
-#define LOGISTIC_NOT_CONVERGED ((logistic_status_t)3)
-#define LOGISTIC_MEMORY_ERROR ((logistic_status_t)4)
-#define LOGISTIC_INVALID_PARAMETER ((logistic_status_t)5)
+#define LOGISTIC_SUCCESS ((mlxlogistic_status_t)0)
+#define LOGISTIC_NULL_POINTER ((mlxlogistic_status_t)1)
+#define LOGISTIC_DIMENSION_MISMATCH ((mlxlogistic_status_t)2)
+#define LOGISTIC_NOT_CONVERGED ((mlxlogistic_status_t)3)
+#define LOGISTIC_MEMORY_ERROR ((mlxlogistic_status_t)4)
+#define LOGISTIC_INVALID_PARAMETER ((mlxlogistic_status_t)5)
 
 typedef struct {
     float learning_rate;      /**< Learning rate for gradient descent */
@@ -23,8 +23,8 @@ typedef struct {
     size_t max_iterations;    /**< Maximum number of training iterations */
     float convergence_tol;    /**< Convergence tolerance */
     bool fit_intercept;       /**< Whether to fit an intercept term */
-    bool verbose;             /**< Whether to print training progress */
-} logistic_config_t;
+    bool verbose;     //???   /**< Whether to print training progress */
+} mlxlogistic_config_t;
 
 /**
  * @brief Logistic regression model structure
@@ -40,8 +40,8 @@ typedef struct {
     size_t num_classes;       /**< Number of classes (1 for binary) */
     float* workspace;         /**< Temporary computation workspace */
     size_t workspace_size;    /**< Size of workspace in floats */
-    logistic_config_t config; /**< Model configuration parameters */
-} logistic_model_t;
+    mlxlogistic_config_t config; /**< Model configuration parameters */
+} mlxlogistic_model_t;
 
 /**
  * @brief Initialize a default logistic regression configuration
@@ -49,7 +49,7 @@ typedef struct {
  * @param config Pointer to configuration structure to initialize
  * @return logistic_status_t Status code
  */
-logistic_status_t mlxlogregconfiginit(logistic_config_t *config);
+mlxlogistic_status_t mlxlogregconfiginit(mlxlogistic_config_t *config);
 
 /**
  * @brief Initialize a logistic regression model
@@ -61,11 +61,11 @@ logistic_status_t mlxlogregconfiginit(logistic_config_t *config);
  * @param config Model configuration (NULL for defaults)
  * @return logistic_status_t Status code
  */
-logistic_status_t mlxlogreginit(logistic_model_t* model, 
+mlxlogistic_status_t mlxlogreginit(mlxlogistic_model_t* model, 
                                mat_region_t* reg,
                                size_t num_features, 
                                size_t num_classes,
-                               const logistic_config_t* config);
+                               const mlxlogistic_config_t* config);
 
 /**
  * @brief Train a logistic regression model using gradient descent
@@ -76,7 +76,7 @@ logistic_status_t mlxlogreginit(logistic_model_t* model,
  * @param reg Memory region for temporary allocations
  * @return logistic_status_t Status code
  */
-logistic_status_t mlxlogregtrain(logistic_model_t* model,
+mlxlogistic_status_t mlxlogregtrain(mlxlogistic_model_t* model,
                                 const mat_t* X,
                                 const float* y,
                                 mat_region_t* reg);
@@ -90,7 +90,7 @@ logistic_status_t mlxlogregtrain(logistic_model_t* model,
  * @param reg Memory region for temporary allocations
  * @return logistic_status_t Status code
  */
-logistic_status_t mlxlogregpredictproba(const logistic_model_t* model,
+mlxlogistic_status_t mlxlogregpredictproba(const mlxlogistic_model_t* model,
                                         const mat_t* X,
                                         float* probs,
                                         mat_region_t* reg);
@@ -104,7 +104,7 @@ logistic_status_t mlxlogregpredictproba(const logistic_model_t* model,
  * @param reg Memory region for temporary allocations
  * @return logistic_status_t Status code
  */
-logistic_status_t mlxlogregpredict(const logistic_model_t* model,
+mlxlogistic_status_t mlxlogregpredict(const mlxlogistic_model_t* model,
                                   const mat_t* X,
                                   float* labels,
                                   mat_region_t* reg);
@@ -119,7 +119,7 @@ logistic_status_t mlxlogregpredict(const logistic_model_t* model,
  * @param reg Memory region for temporary allocations
  * @return logistic_status_t Status code
  */
-logistic_status_t mlxlogregcrossentropy(const logistic_model_t* model,
+mlxlogistic_status_t mlxlogregcrossentropy(const mlxlogistic_model_t* model,
                                    const mat_t* X,
                                    const float* y,
                                    float* loss,
@@ -131,6 +131,6 @@ logistic_status_t mlxlogregcrossentropy(const logistic_model_t* model,
  * @param status Status code
  * @return const char* String description
  */
-const char* mlxlogregstrerror(logistic_status_t status);
+const char* mlxlogregstrerror(mlxlogistic_status_t status);
 
 #endif // MLX_LOGISTIC_H

@@ -1,7 +1,7 @@
 #include "../../include/ml/logistic.h"
 #include "../../include/matrix/matpool.h"
 
-logistic_status_t mlxlogregconfiginit(logistic_config_t* config) {
+mlxlogistic_status_t mlxlogregconfiginit(mlxlogistic_config_t* config) {
     if (!config) {
         return LOGISTIC_NULL_POINTER;
     }
@@ -17,11 +17,11 @@ logistic_status_t mlxlogregconfiginit(logistic_config_t* config) {
     return LOGISTIC_SUCCESS;
 }
 
-logistic_status_t mlxlogreginit(logistic_model_t* model, 
+mlxlogistic_status_t mlxlogreginit(mlxlogistic_model_t* model, 
                                mat_region_t* reg,
                                size_t num_features, 
                                size_t num_classes,
-                               const logistic_config_t* config) {
+                               const mlxlogistic_config_t* config) {
                                
     if (!model || !reg) {
         return LOGISTIC_NULL_POINTER;
@@ -32,7 +32,7 @@ logistic_status_t mlxlogreginit(logistic_model_t* model,
     }
     
     // Apply default configuration if none provided
-    logistic_config_t default_config;
+    mlxlogistic_config_t default_config;
     if (!config) {
         logistic_config_init(&default_config);
         config = &default_config;
