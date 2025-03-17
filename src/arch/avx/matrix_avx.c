@@ -4,7 +4,7 @@
 // #if defined(MAT_USE_AVX)
 #include <immintrin.h>
 
-mat_status_t matadd(const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT *c) {
+mat_status_t matadd(const mat_t *a, const mat_t *b, mat_t *c) {
     if (!a || !b || !c) {
         return MATRIX_NULL_POINTER;
     }
@@ -36,7 +36,7 @@ mat_status_t matadd(const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT 
     return MATRIX_SUCCESS;
 }
 
-mat_status_t matsub(const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT *c) {
+mat_status_t matsub(const mat_t *a, const mat_t *b, mat_t *c) {
     if (!a || !b || !c) {
         return MATRIX_NULL_POINTER;
     }
@@ -68,7 +68,7 @@ mat_status_t matsub(const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT 
     return MATRIX_SUCCESS;
 }
 
-mat_status_t matmul(const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT *c) {
+mat_status_t matmul(const mat_t *a, const mat_t *b, mat_t *c) {
     if (!a || !b || !c) {
         return MATRIX_NULL_POINTER;
     }
@@ -112,7 +112,7 @@ mat_status_t matmul(const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT 
     return MATRIX_SUCCESS;
 }
 
-mat_status_t mattranspose (const mat_t MAT_IN *a, mat_t MAT_OUT *b) {
+mat_status_t mattranspose (const mat_t *a, mat_t *b) {
     if (!a || !b) {
         return MATRIX_NULL_POINTER;
     }
@@ -243,7 +243,7 @@ float matdot(const float *a, const float *b, size_t length) {
     return result;
 }
 
-mat_status_t matvecmul(const mat_t MAT_IN *a, const float MAT_IN *x, float MAT_OUT *y) {
+mat_status_t matvecmul(const mat_t *a, const float *x, float *y) {
     if (!a || !x || !y) {
         return MATRIX_NULL_POINTER;
     }
@@ -256,7 +256,7 @@ mat_status_t matvecmul(const mat_t MAT_IN *a, const float MAT_IN *x, float MAT_O
     return MATRIX_SUCCESS;
 }
 
-mat_status_t matreshapeip(mat_t MAT_INOUT *a, size_t new_row, size_t new_col) {
+mat_status_t matreshapeip(mat_t *a, size_t new_row, size_t new_col) {
     if (!a) {
         return MATRIX_NULL_POINTER;
     }
@@ -303,7 +303,7 @@ mat_status_t matreshapeip(mat_t MAT_INOUT *a, size_t new_row, size_t new_col) {
  * @param b Output matrix (must be pre-allocated with proper dimensions)
  * @return mat_status_t Status code
  */
-mat_status_t matreshape(const mat_t MAT_IN *a, size_t row, size_t col, mat_t MAT_OUT *b) {
+mat_status_t matreshape(const mat_t *a, size_t row, size_t col, mat_t *b) {
     // Validate input parameters
     if (!a || !b) {
         return MATRIX_NULL_POINTER;
@@ -353,6 +353,7 @@ mat_status_t matreshape(const mat_t MAT_IN *a, size_t row, size_t col, mat_t MAT
  * @param b Output matrix (will be allocated in the region)
  * @return mat_status_t Status code
  */
+/*
 mat_status_t matreshapereg(mat_region_t *reg, const mat_t MAT_IN *a, 
                                size_t row, size_t col, mat_t MAT_OUT *b) {
     if (!reg || !a || !b) {
@@ -387,6 +388,7 @@ mat_status_t matreshapereg(mat_region_t *reg, const mat_t MAT_IN *a,
     
     return MATRIX_SUCCESS;
 }
+*/
 
 /**
  * @brief Block-based matrix reshape for better memory efficiency
@@ -400,7 +402,7 @@ mat_status_t matreshapereg(mat_region_t *reg, const mat_t MAT_IN *a,
  * @param b Output matrix (must be pre-allocated with proper dimensions)
  * @return mat_status_t Status code
  */
-mat_status_t matreshapeblock(const mat_t MAT_IN *a, size_t row, size_t col, mat_t MAT_OUT *b) {
+mat_status_t matreshapeblock(const mat_t *a, size_t row, size_t col, mat_t *b) {
     // Validate input parameters
     if (!a || !b) {
         return MATRIX_NULL_POINTER;

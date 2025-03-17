@@ -90,7 +90,7 @@ mat_status_t matalloc(mat_region_t *reg, size_t rows, size_t cols, mat_t MAT_OUT
 }
 
 mat_status_t matcreate(mat_region_t *reg,
-        size_t rows, size_t cols, const float MAT_NULLABLE *data,
+        size_t rows, size_t cols, const float *data,
         mat_t *mat) {
     mat_status_t stat = matalloc(reg, rows, cols, mat);
     if (stat != MATRIX_SUCCESS)

@@ -1,14 +1,14 @@
 #ifndef MLX_LOGISTIC_H
 #define MLX_LOGISTIC_H
 
-#include "matrix/matrix.h"
-#include "matrix/matpool.h"
+#include "../matrix/matrix.h"
+#include "../matrix/matpool.h"
 
 typedef unsigned char mlxlogistic_status_t;
-typedef enum {
-    false,
-    true
-} bool; 
+typedef enum mlxbool {
+    mlxboolfalse,
+    mlxbooltrue
+} mlxbool;
 
 #define LOGISTIC_SUCCESS ((mlxlogistic_status_t)0)
 #define LOGISTIC_NULL_POINTER ((mlxlogistic_status_t)1)
@@ -22,8 +22,8 @@ typedef struct {
     float l2_regularization;  /**< L2 regularization strength */
     size_t max_iterations;    /**< Maximum number of training iterations */
     float convergence_tol;    /**< Convergence tolerance */
-    bool fit_intercept;       /**< Whether to fit an intercept term */
-    bool verbose;     //???   /**< Whether to print training progress */
+    mlxbool fit_intercept;       /**< Whether to fit an intercept term */
+    mlxbool verbose;     //???   /**< Whether to print training progress */
 } mlxlogistic_config_t;
 
 /**
@@ -35,7 +35,7 @@ typedef struct {
  */
 typedef struct {
     mat_t weights;            /**< Model weights (including intercept if used) */
-    bool has_intercept;       /**< Whether model includes an intercept term */
+    mlxbool has_intercept;       /**< Whether model includes an intercept term */
     size_t num_features;      /**< Number of features (excluding intercept) */
     size_t num_classes;       /**< Number of classes (1 for binary) */
     float* workspace;         /**< Temporary computation workspace */
@@ -107,6 +107,7 @@ mlxlogistic_status_t mlxlogregpredictproba(const mlxlogistic_model_t* model,
 mlxlogistic_status_t mlxlogregpredict(const mlxlogistic_model_t* model,
                                   const mat_t* X,
                                   float* labels,
+                                  float threshold,
                                   mat_region_t* reg);
 
 /**

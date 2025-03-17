@@ -39,7 +39,7 @@ mat_status_t reginit(mat_region_t *reg, void *memory, size_t size);
 mat_status_t regreset(mat_region_t *reg);
 mat_status_t matalloc(mat_region_t *reg, size_t rows, size_t cols, mat_t MAT_OUT *mat);
 mat_status_t matcreate(mat_region_t *reg, size_t rows, size_t cols, 
-                        const float MAT_NULLABLE *data, mat_t *mat);
+                        const float *data, mat_t *mat);
 mat_status_t matresalloc(mat_region_t *reg, const mat_t MAT_IN *A,
                         const mat_t MAT_IN *B, mat_t MAT_OUT *C);
 const char *strmaterr(mat_status_t stat);

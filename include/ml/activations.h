@@ -92,7 +92,7 @@ static inline float mlxmatexpf(float x) {
  * @param x Input value
  * @return Approximation of ln(x)
  */
-static inline float mlxmatlogf(float x) {
+float mlxmatlogf(float x) {
     // Handle special cases
     if (x <= 0.0f) return -3.4028235e+38f; // Return negative max float for invalid input
     if (x == 1.0f) return 0.0f;

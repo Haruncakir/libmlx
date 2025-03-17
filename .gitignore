@@ -53,3 +53,5 @@ dkms.conf
 
 # Text Editor, IDE
 .vscode
+
+test/exe

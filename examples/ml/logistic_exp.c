@@ -32,8 +32,8 @@ int main() {
     config.l2_regularization = 0.1f;
     config.max_iterations = 100;
     config.convergence_tol = 0.0001f;
-    config.fit_intercept = true;
-    config.verbose = true;
+    config.fit_intercept = mlxbooltrue;
+    config.verbose = mlxbooltrue;
     
     // Initialize a binary logistic regression model (num_classes = 1)
     mlxlogistic_model_t binary_model;
@@ -162,7 +162,7 @@ int main() {
     
     // Predict class labels
     float labels[4];
-    mlxlogregpredict(&binary_model, &X, labels, &region);
+    mlxlogregpredict(&binary_model, &X, labels, 0.5, &region);
     
     /* 
      * Class Prediction Visualization:
@@ -335,7 +335,7 @@ int main() {
     
     // Predict class labels
     float labels_multi[6];
-    mlxlogregpredict(&multi_model, &X_iris, labels_multi, &region);
+    mlxlogregpredict(&multi_model, &X_iris, labels_multi, 0.5, &region);
     
     /* 
      * Class Prediction Visualization (Multinomial):

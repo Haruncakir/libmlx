@@ -116,28 +116,28 @@
     #define MAT_UNLIKELY(x) (x)
 #endif
 
-/* from stdint.h */
-/* Types for `void *' pointers.  */
-#if __WORDSIZE == 64
-# ifndef __intptr_t_defined
-typedef long int		intptr_t;
-#  define __intptr_t_defined
-# endif
-typedef unsigned long int	uintptr_t;
+// Define uintptr_t based on the architecture
+#if defined(__SIZEOF_POINTER__) // Check if the macro is defined
+    #if __SIZEOF_POINTER__ == 8
+        typedef unsigned long uintptr_t; // 64-bit architecture
+    #elif __SIZEOF_POINTER__ == 4
+        typedef unsigned int uintptr_t; // 32-bit architecture
+    #else
+        #error "Unsupported pointer size"
+    #endif
 #else
-# ifndef __intptr_t_defined
-typedef int			intptr_t;
-#  define __intptr_t_defined
-# endif
-typedef unsigned int		uintptr_t;
+    // Fallback definition (assuming 32-bit if not defined)
+    typedef unsigned int uintptr_t; // Default to 32-bit
 #endif
 
 /* Threading model - default to single-threaded for embedded */
+/*! not implemented */
 #ifndef MAT_MULTI_THREADED
     #define MAT_MULTI_THREADED 0
 #endif
 
 /* memory allocation strategy */
+/*! not implemented */
 #ifndef MAT_USE_MALLOC
     #define MAT_USE_MALLOC 0  /* Default to not using dynamic allocation */
 #endif

@@ -1,6 +1,41 @@
 #include "../../include/matrix/matpool.h"
 #include "../../include/matrix/matrix_config.h"
 
+static float __sqrtf(float x) {
+    // Handle special cases
+    if (x <= 0.0f) {
+        // Return 0 for 0 or NaN for negative input
+        return (x == 0.0f) ? 0.0f : (0.0f / 0.0f); // Use NaN for negative numbers
+    }
+    
+    // Initial guess - a good starting point saves iterations
+    // Using union for safe type punning
+    union {
+        float f;
+        int i;
+    } u;
+
+    u.f = x;
+    // Shift right to divide the exponent by 2
+    u.i = (u.i >> 1) + (0x3f << 22); // 0x3f << 22 is approximately 0.5 in floating point
+    float guess = u.f;
+    
+    // Newton's method iterations
+    // x_{n+1} = (x_n + S/x_n) / 2
+    // Usually 3-4 iterations are enough for single precision
+    
+    // First iteration
+    guess = 0.5f * (guess + x / guess);
+    // Second iteration
+    guess = 0.5f * (guess + x / guess);
+    // Third iteration
+    guess = 0.5f * (guess + x / guess);
+    // Fourth iteration for very high precision
+    guess = 0.5f * (guess + x / guess);
+    
+    return guess;
+}
+
 float matget(const mat_t *m, size_t row, size_t col) {
     if (!m || row >= m->row || col >= m->col) {
         return 0.0f;  /* Safe default on error */
@@ -13,13 +48,6 @@ void matset(mat_t *m, size_t row, size_t col, float value) {
         return;  /* Ignore if out of bounds */
     }
     m->data[row * m->stride + col] = value;
-}
-
-mat_status_t matfill(mat_t *m, float value) {
-    for (size_t i = 0; i < m->row; ++i) {
-        for (size_t j = 0; j < m->col; ++j)
-            m->data[i * m->row + j] = value;
-    }
 }
 
 /* Get pointer to start of row for direct access */
@@ -74,7 +102,7 @@ mat_status_t matcopy(const mat_t *src, mat_t *dst) {
     
     for (size_t i = 0; i < src->row; i++) {
         for (size_t j = 0; j < src->col; j++) {
-            mat_set(dst, i, j, mat_get(src, i, j));
+            matset(dst, i, j, matget(src, i, j));
         }
     }
     
@@ -88,12 +116,12 @@ mat_status_t matidentity(mat_t *m) {
     }
     
     /* Set all elements to zero first */
-    mat_fill(m, 0.0f);
+    matfill(m, 0.0f);
     
     /* Set diagonal elements to 1.0 */
     size_t min_dim = (m->row < m->col) ? m->row : m->col;
     for (size_t i = 0; i < min_dim; i++) {
-        mat_set(m, i, i, 1.0f);
+        matset(m, i, i, 1.0f);
     }
     
     return MATRIX_SUCCESS;
@@ -108,11 +136,11 @@ float matnorm(const mat_t *m) {
     float sum = 0.0f;
     for (size_t i = 0; i < m->row; i++) {
         for (size_t j = 0; j < m->col; j++) {
-            float val = mat_get(m, i, j);
+            float val = matget(m, i, j);
             sum += val * val;
         }
     }
     
     /* Return square root of sum of squares */
-    return sqrtf(sum);
+    return __sqrtf(sum);
 }

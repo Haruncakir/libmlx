@@ -1,7 +1,13 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include "matpool.h"
+//#include "matpool.h"
+
+#ifdef __SIZE_TYPE__
+typedef __SIZE_TYPE__ size_t;
+#else
+typedef unsigned long size_t;
+#endif
 
 typedef struct {
     size_t row;
@@ -11,18 +17,12 @@ typedef struct {
                       many deep learning models can tolerate reduced precision (float16) */
 } mat_t;
 
-#ifdef __SIZE_TYPE__
-typedef __SIZE_TYPE__ size_t;
-#else
-typedef unsigned long size_t;
-#endif
-
 /* parameter annotations for better static analysis */
-#define MAT_IN
-#define MAT_OUT
-#define MAT_INOUT
-#define MAT_NULLABLE
-#define MAT_NONNULL
+#define MAT_IN  
+#define MAT_OUT  
+#define MAT_INOUT  
+#define MAT_NULLABLE   
+#define MAT_NONNULL  
 
 typedef unsigned char mat_status_t;
 
@@ -50,16 +50,16 @@ typedef unsigned char mat_status_t;
 // Design choice -> caller-provided buffers.
 
 /* Core matrix operations - implementation varies by architecture */
-mat_status_t matadd       (const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT *c);
-mat_status_t matsub       (const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT *c);
-mat_status_t matmul       (const mat_t MAT_IN *a, const mat_t MAT_IN *b, mat_t MAT_OUT *c);
-mat_status_t matvecmul    (const mat_t MAT_IN *a, const float MAT_IN *x, float MAT_OUT *y);
-mat_status_t mattranspose (const mat_t MAT_IN *a,                        mat_t MAT_OUT *b);
-mat_status_t matreshape   (const mat_t MAT_IN *a, size_t row, size_t col, mat_t MAT_OUT *b);
-mat_status_t matreshapeip (const mat_t MAT_INOUT *a, size_t row, size_t col);
-mat_status_t matreshapeblock(const mat_t MAT_IN *a, size_t row, size_t col, mat_t MAT_OUT *b);
-mat_status_t matreshapereg(mat_region_t *reg, const mat_t MAT_IN *a, 
-                               size_t row, size_t col, mat_t MAT_OUT *b);
+mat_status_t matadd       (const mat_t *a, const mat_t *b, mat_t *c);
+mat_status_t matsub       (const mat_t *a, const mat_t *b, mat_t *c);
+mat_status_t matmul       (const mat_t *a, const mat_t *b, mat_t *c);
+mat_status_t matvecmul    (const mat_t *a, const float *x, float *y);
+mat_status_t mattranspose (const mat_t *a,                        mat_t *b);
+mat_status_t matreshape   (const mat_t *a, size_t row, size_t col, mat_t *b);
+mat_status_t matreshapeip (mat_t *a, size_t row, size_t col);
+mat_status_t matreshapeblock(const mat_t *a, size_t row, size_t col, mat_t *b);
+//mat_status_t matreshapereg(mat_region_t *reg, const mat_t MAT_IN *a, 
+//                               size_t row, size_t col, mat_t MAT_OUT *b);
 float        matdot       (const float *a,        const float *b,        size_t length);
 
 /* Common utility functions - same implementation for all architectures */
