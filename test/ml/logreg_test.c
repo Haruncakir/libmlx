@@ -28,6 +28,8 @@ void generate_data(float* X, float* y, size_t n_samples) {
     }
 }
 
+// TODO: noise
+
 // Function to evaluate model accuracy
 float compute_accuracy(float* predictions, float* targets, size_t n_samples) {
     size_t correct = 0;
@@ -61,7 +63,14 @@ int main() {
     float y_data[NUM_SAMPLES];
     
     generate_data(X_data, y_data, NUM_SAMPLES);
-    
+
+/*
+    FILE *data_file = fopen("data_file.csv", "w");
+    for (size_t i = 0; i < NUM_SAMPLES; ++i)
+        fprintf(data_file, "%f,%f,%f\n", X_data[i * NUM_FEATURES], X_data[i * NUM_FEATURES + 1], y_data[i]);
+    fclose(data_file);
+*/
+
     // 3. Create matrix for features
     mat_t X;
     mat_status = matcreate(&region, NUM_SAMPLES, NUM_FEATURES, X_data, &X);
@@ -75,7 +84,7 @@ int main() {
     mlxlogregconfiginit(&config);
     
     // Customize configuration
-    config.learning_rate = 0.01f;
+    config.learning_rate = 0.001f;
     config.l2_regularization = 0.01f;
     config.max_iterations = 100; // 1000
     config.convergence_tol = 1e-6f;

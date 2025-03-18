@@ -190,7 +190,7 @@ mlxlogistic_status_t mlxlogregtrain(mlxlogistic_model_t* model,
         }
         
         // Gradient descent loop
-        float prev_loss = (1<<16);
+        float prev_loss = 1e30f;
         
         for (size_t iter = 0; iter < model->config.max_iterations; iter++) {
             // 1. Compute predictions: sigmoid(X * weights)
