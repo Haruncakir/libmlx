@@ -14,5 +14,10 @@ gcc -g -mavx -Wall -Wextra -c matrix_avx_test.c -o ../exe/matrix_avx_test.o || {
 # Link object files to create the executable
 gcc -o ../exe/matrix_avx_test ../exe/matrix_common.o ../exe/matpool.o ../exe/matrix_avx.o ../exe/matrix_avx_test.o || { echo "Linking failed"; exit 1; }
 
+gcc -g -mavx -Wall -Wextra -c matpool_test.c -o ../exe/matpool_test.o || { echo "Compilation failed for matpool_test.c"; exit 1; }
+
+gcc -o ../exe/matpool_test ../exe/matrix_common.o ../exe/matpool.o ../exe/matpool_test.o -lm || { echo "Linking failed"; exit 1; }
+
 # Run the executable
-./../exe/matrix_avx_test
+# ./../exe/matrix_avx_test
+./../exe/matpool_test

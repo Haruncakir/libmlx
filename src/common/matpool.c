@@ -69,16 +69,22 @@ mat_status_t matalloc(mat_region_t *reg, size_t rows, size_t cols, mat_t MAT_OUT
         return MATRIX_DIMENSION_MISMATCH;
    
     /* Calculate matrix stride for proper SIMD alignment */
-    size_t stride = cols;
-    if (cols % (SIMD_ALIGN / sizeof(float)) != 0) {
-        stride = ((cols / (SIMD_ALIGN / sizeof(float))) + 1) * (SIMD_ALIGN / sizeof(float));
-    }
+    //size_t stride = cols;
+    //if (cols % (SIMD_ALIGN / sizeof(float)) != 0) {
+    //    stride = ((cols / (SIMD_ALIGN / sizeof(float))) + 1) * (SIMD_ALIGN / sizeof(float));
+    //}
+    size_t floats_per_align = SIMD_ALIGN / sizeof(float);
+    size_t stride = ((cols + floats_per_align - 1) / floats_per_align) * floats_per_align;
     
     /* Allocate memory for matrix with stride for proper row alignment */
     size_t data_size = rows * stride * sizeof(float);
     float *data = (float*)regalloc(reg, data_size);
     if (!data)
         return MATRIX_REGION_FULL;
+    
+    for (size_t i = 0; i < rows * stride; i++) {
+        data[i] = 0.0f;  // Initialize all memory (including padding due to stride)
+    }
    
     mat->row = rows;
     mat->col = cols;

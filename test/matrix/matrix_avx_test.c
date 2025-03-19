@@ -7,8 +7,8 @@
 #include "../../include/matrix/matrix_config.h"
 #include "../../include/matrix/matrix.h"
 
-#define TEST_PASSED "PASSED"
-#define TEST_FAILED "FAILED"
+#define TEST_PASSED "\033[32mPASSED\033[0m"
+#define TEST_FAILED "\033[31mFAILED\033[0m"
 
 #define EPSILON 1e-5f
 #define MAX_TEST_SIZE 100

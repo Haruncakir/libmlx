@@ -48,7 +48,7 @@ int main() {
     printf("---------------------------------------------------\n");
     
     // 1. Allocate memory region for the model and operations
-    size_t region_size = 1024 * 256;
+    size_t region_size = 1024 * 512;
     unsigned char* memory[region_size];
     
     mat_region_t region;
@@ -84,9 +84,9 @@ int main() {
     mlxlogregconfiginit(&config);
     
     // Customize configuration
-    config.learning_rate = 0.001f;
-    config.l2_regularization = 0.01f;
-    config.max_iterations = 100; // 1000
+    config.learning_rate = 0.01f;
+    config.l2_regularization = 0.1f;
+    config.max_iterations = 5000; // 1000
     config.convergence_tol = 1e-6f;
     config.fit_intercept = mlxbooltrue;
     config.verbose = mlxbooltrue;
@@ -127,6 +127,8 @@ int main() {
         }
     }
     printf("\n");
+
+    regreset(&region);
     
     // 7. Make predictions
     float predictions[NUM_SAMPLES];

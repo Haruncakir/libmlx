@@ -15,5 +15,9 @@ gcc -g -mavx -Wall -Wextra -c logreg_test.c -o ../exe/logreg_test.o || { echo "C
 # Link object files to create the executable
 gcc -o ../exe/logreg_test ../exe/matrix_common.o ../exe/matpool.o ../exe/matrix_avx.o ../exe/logreg.o ../exe/logreg_test.o || { echo "Linking failed"; exit 1; }
 
+gcc -g -mavx -Wall -Wextra -c activations_test.c -o ../exe/activations_test.o || { echo "Compilation failed for activations_test.c"; exit 1; }
+gcc -o ../exe/activations_test ../exe/activations_test.o -lm
+
 # Run the executable
 ./../exe/logreg_test
+# ./../exe/activations_test

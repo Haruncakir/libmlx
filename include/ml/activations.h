@@ -43,48 +43,39 @@ unsigned int mlxlcgrand() {
  * @param x Input value
  * @return Approximation of e^x
  */
+
 static inline float mlxmatexpf(float x) {
-    // Handle special cases
-    if (x == 0.0f) return 1.0f;
+    // Handle special cases for extreme values
     if (x >= 88.0f) return 3.4028235e+38f; // Near float max value
     if (x <= -88.0f) return 0.0f;           // Near zero
-    
-    // Split x into integer and fractional parts
-    int int_part = (int)x;
-    float frac_part = x - int_part;
-    
-    // e^int_part using bit manipulation (2^i = 1 << i)
-    // e^x = 2^(x * log2(e)) where log2(e) ≈ 1.44269504
+    if (x == 0.0f) return 1.0f;             // e^0 = 1
+
+    // Use the identity e^x = e^(int_part + frac_part) = e^int_part * e^frac_part
+    int int_part = (int)x;                  // Integer part of x
+    float frac_part = x - int_part;         // Fractional part of x
+
+    // Compute e^int_part using repeated multiplication
     float result = 1.0f;
-    float power_of_e = 2.718281828459f; // e
-    
-    // Compute e^int_part
-    if (int_part >= 0) {
-        while (int_part > 0) {
-            if (int_part & 1) result *= power_of_e;
-            power_of_e *= power_of_e;
-            int_part >>= 1;
+    float e = 2.718281828459f;              // Value of e
+    if (int_part > 0) {
+        for (int i = 0; i < int_part; i++) {
+            result *= e;
         }
-    } else {
-        int_part = -int_part;
-        while (int_part > 0) {
-            if (int_part & 1) result /= power_of_e;
-            power_of_e *= power_of_e;
-            int_part >>= 1;
+    } else if (int_part < 0) {
+        for (int i = 0; i < -int_part; i++) {
+            result /= e;
         }
     }
-    
-    // Compute e^frac_part using Taylor series
-    // e^x = 1 + x + x^2/2! + x^3/3! + ...
-    float term = 1.0f;
-    float sum = term;
-    for (int i = 1; i < 10; i++) { // 10 terms for good accuracy
-        term *= frac_part / i;
-        sum += term;
-        if (term < 1e-7f * sum) break; // Early termination
-    }
-    
-    return result * sum;
+
+    // Compute e^frac_part using a fast polynomial approximation
+    // This is a 4th-order polynomial approximation for e^x over the range [-1, 1]
+    float x2 = frac_part * frac_part;
+    float x3 = x2 * frac_part;
+    float x4 = x3 * frac_part;
+    float poly = 1.0f + frac_part + 0.5f * x2 + 0.1666667f * x3 + 0.0416667f * x4;
+
+    // Multiply the results
+    return result * poly;
 }
 
 /**

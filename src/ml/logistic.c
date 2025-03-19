@@ -163,19 +163,20 @@ mlxlogistic_status_t mlxlogregtrain(mlxlogistic_model_t* model,
         const mat_t* X_work = model->has_intercept ? &X_with_intercept : X;
 
         mat_t predictions_mat;
-        mat_status_t ws_status = matalloc(reg, 1, num_samples * sizeof(float), &predictions_mat);
+        // mat_status_t ws_status = matalloc(reg, 1, num_samples * sizeof(float), &predictions_mat);
+        mat_status_t ws_status = matalloc(reg, 1, num_samples, &predictions_mat);
         if (ws_status != MATRIX_SUCCESS) {
             return LOGISTIC_MEMORY_ERROR;
         }
 
         mat_t errors_mat;
-        ws_status = matalloc(reg, 1, num_samples * sizeof(float), &errors_mat);
+        ws_status = matalloc(reg, 1, num_samples, &errors_mat);
         if (ws_status != MATRIX_SUCCESS) {
             return LOGISTIC_MEMORY_ERROR;
         }
 
         mat_t num_features_mat;
-        ws_status = matalloc(reg, 1, num_samples * sizeof(float), &num_features_mat);
+        ws_status = matalloc(reg, 1, num_samples, &num_features_mat);
         if (ws_status != MATRIX_SUCCESS) {
             return LOGISTIC_MEMORY_ERROR;
         }
@@ -192,12 +193,25 @@ mlxlogistic_status_t mlxlogregtrain(mlxlogistic_model_t* model,
         // Gradient descent loop
         float prev_loss = 1e30f;
         
-        for (size_t iter = 0; iter < model->config.max_iterations; iter++) {
+        for (size_t iter = 0; iter < model->config.max_iterations; ++iter) {
             // 1. Compute predictions: sigmoid(X * weights)
-            mat_status_t status = matvecmul(&predictions_mat, X_work->data, model->weights.data);
-            if (status != MATRIX_SUCCESS) {
-                return LOGISTIC_MEMORY_ERROR;
+            mat_t X_work_transpose;
+            ws_status = matalloc(reg, X_work->col, X_work->row, &X_work_transpose);
+            mattranspose(X_work, &X_work_transpose);
+
+            for (size_t i = 0; i < num_samples; i++) {
+                // Get pointer to the i-th row of X_work
+                float *row = &X_work->data[i * X_work->stride];
+                // Compute dot product with weights
+                predictions[i] = matdot(row, model->weights.data, num_features);
             }
+
+
+            //mat_status_t status = matvecmul(X_work, model->weights.data, predictions);
+            //matvecmul(&predictions_mat, X_work->data, model->weights.data);
+            //if (status != MATRIX_SUCCESS) {
+            //    return LOGISTIC_MEMORY_ERROR;
+            //}
             
             compute_sigmoid(predictions, predictions, num_samples);
             
@@ -261,6 +275,18 @@ mlxlogistic_status_t mlxlogregtrain(mlxlogistic_model_t* model,
             }
             
             prev_loss = loss;
+/*
+            printf("Iteration %zu:\n", iter);
+            printf("Predictions: ");
+            for (size_t i = 0; i < num_samples; i++) printf("%f ", predictions[i]);
+            printf("\nErrors: ");
+            for (size_t i = 0; i < num_samples; i++) printf("%f ", errors[i]);
+            printf("\nGradients: ");
+            for (size_t j = 0; j < num_features; j++) printf("%f ", gradients[j]);
+            printf("\nWeights: ");
+            for (size_t j = 0; j < num_features; j++) printf("%f ", model->weights.data[j]);
+            printf("\n");
+*/
         }
         
         // If we get here, we didn't converge within max_iterations
