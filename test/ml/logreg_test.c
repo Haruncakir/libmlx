@@ -12,9 +12,10 @@
 // Function to generate synthetic data
 void generate_data(float* X, float* y, size_t n_samples) {
     // Seed random number generator
-    srand(42);
+    srand(time(NULL));
     
-    for (size_t i = 0; i < n_samples; i++) {
+    size_t i = 0;
+    for (; i < n_samples * .8; ++i) {
         // Generate random points between -1 and 1
         float x1 = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
         float x2 = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
@@ -26,9 +27,20 @@ void generate_data(float* X, float* y, size_t n_samples) {
         // Assign label: 1 if x2 > x1, 0 otherwise (separable by line y = x)
         y[i] = (x2 > x1) ? 1.0f : 0.0f;
     }
+    // noise
+    for (;i < n_samples; ++i) {
+        // Generate random points between -1 and 1
+        float x1 = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+        float x2 = ((float)rand() / RAND_MAX) * 2.0f - 1.0f;
+        
+        // Store features
+        X[i * NUM_FEATURES] = x1;
+        X[i * NUM_FEATURES + 1] = x2;
+        
+        // Assign label: 0 if x2 > x1, 1 otherwise
+        y[i] = (x2 > x1) ? 0.0f : 1.0f;
+    }
 }
-
-// TODO: noise
 
 // Function to evaluate model accuracy
 float compute_accuracy(float* predictions, float* targets, size_t n_samples) {
@@ -128,7 +140,8 @@ int main() {
     }
     printf("\n");
 
-    regreset(&region);
+    printf("Mat count: %zu, region used: %zu\n", region.mat_count, region.used);
+
     
     // 7. Make predictions
     float predictions[NUM_SAMPLES];
@@ -159,12 +172,12 @@ int main() {
     printf("\nSample predictions:\n");
     printf("  Index | Features            | True Label | Prediction | Probability\n");
     printf("  ------|---------------------|------------|------------|------------\n");
-    
+
     for (size_t i = 0; i < 10; i++) {
-        printf("  %4zu | (%6.3f, %6.3f) | %10.0f | %10.0f | %11.6f\n",
-               i, X_data[i*NUM_FEATURES], X_data[i*NUM_FEATURES+1], 
-               y_data[i], predictions[i], probabilities[i]);
+        printf("  %4zu  | (%7.4f, %7.4f)  | %10d | %10d | %11.6f\n",
+            i, X_data[i*NUM_FEATURES], X_data[i*NUM_FEATURES+1],
+            (int)y_data[i], (int)predictions[i], probabilities[i]);
     }
-    
+    regreset(&region);
     return 0;
 }

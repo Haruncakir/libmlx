@@ -1,7 +1,10 @@
 #include "../../include/ml/logistic.h"
 #include "../../include/ml/activations.h"
 #include "../../include/matrix/matpool.h"
+
+#ifdef DEBUG
 #include <stdio.h>
+#endif
 
 static void compute_sigmoid(const float* input, float* output, size_t n) {
     for (size_t i = 0; i < n; i++) {
@@ -105,7 +108,7 @@ mlxlogistic_status_t mlxlogreginit(mlxlogistic_model_t* model,
     return LOGISTIC_SUCCESS;
 }
 
-static float __fabsf(float x) {
+static float __mlxfabsf(float x) {
     // Bit manipulation approach - clear the sign bit
     unsigned int* ptr = (unsigned int*)&x;
     *ptr &= 0x7FFFFFFF; // Mask out the sign bit (MSB)
@@ -192,20 +195,19 @@ mlxlogistic_status_t mlxlogregtrain(mlxlogistic_model_t* model,
         
         // Gradient descent loop
         float prev_loss = 1e30f;
+
+        // 1. Compute predictions: sigmoid(X * weights)
+        mat_t X_work_transpose;
+        ws_status = matalloc(reg, X_work->col, X_work->row, &X_work_transpose);
+        mattranspose(X_work, &X_work_transpose);
         
         for (size_t iter = 0; iter < model->config.max_iterations; ++iter) {
-            // 1. Compute predictions: sigmoid(X * weights)
-            mat_t X_work_transpose;
-            ws_status = matalloc(reg, X_work->col, X_work->row, &X_work_transpose);
-            mattranspose(X_work, &X_work_transpose);
-
             for (size_t i = 0; i < num_samples; i++) {
                 // Get pointer to the i-th row of X_work
                 float *row = &X_work->data[i * X_work->stride];
                 // Compute dot product with weights
                 predictions[i] = matdot(row, model->weights.data, num_features);
             }
-
 
             //mat_status_t status = matvecmul(X_work, model->weights.data, predictions);
             //matvecmul(&predictions_mat, X_work->data, model->weights.data);
@@ -218,7 +220,6 @@ mlxlogistic_status_t mlxlogregtrain(mlxlogistic_model_t* model,
             // 2. Compute errors: predictions - targets
             for (size_t i = 0; i < num_samples; i++) {
                 errors[i] = predictions[i] - y[i];
-                //printf("errors[%d]: %f\n", i, errors[i]);
             }
             
             // 3. Compute gradients: X^T * errors / num_samples + regularization
@@ -255,7 +256,9 @@ mlxlogistic_status_t mlxlogregtrain(mlxlogistic_model_t* model,
                 loss -= t * mlxmatlogf(p) + (1.0f - t) * mlxmatlogf(1.0f - p);
             }
             loss /= num_samples;
+#ifdef DEBUG
             printf("loss: %f\n", loss);
+#endif
             
             // Add L2 regularization term to loss
             if (model->config.l2_regularization > 0.0f) {
@@ -270,23 +273,11 @@ mlxlogistic_status_t mlxlogregtrain(mlxlogistic_model_t* model,
             }
             
             // Check for convergence
-            if (__fabsf(loss - prev_loss) < model->config.convergence_tol) {
+            if (__mlxfabsf(loss - prev_loss) < model->config.convergence_tol) {
                 return LOGISTIC_SUCCESS;
             }
             
             prev_loss = loss;
-/*
-            printf("Iteration %zu:\n", iter);
-            printf("Predictions: ");
-            for (size_t i = 0; i < num_samples; i++) printf("%f ", predictions[i]);
-            printf("\nErrors: ");
-            for (size_t i = 0; i < num_samples; i++) printf("%f ", errors[i]);
-            printf("\nGradients: ");
-            for (size_t j = 0; j < num_features; j++) printf("%f ", gradients[j]);
-            printf("\nWeights: ");
-            for (size_t j = 0; j < num_features; j++) printf("%f ", model->weights.data[j]);
-            printf("\n");
-*/
         }
         
         // If we get here, we didn't converge within max_iterations
@@ -348,13 +339,35 @@ mlxlogistic_status_t mlxlogregpredictproba(const mlxlogistic_model_t* model,
         }
 
         float* linear_preds = model->workspace;
+
+/*
+        size_t num_features = model->weights.col;
+        for (size_t i = 0; i < num_samples; ++i) {
+            // Get pointer to the i-th row of X_work
+            float *row = &X_work->data[i * X_work->stride];
+            // Compute dot product with weights
+            linear_preds[i] = matdot(row, model->weights.data, num_features);
+        }
+*/
+        // Compute predictions manually
+        for (size_t i = 0; i < num_samples; ++i) {
+            float sum = 0.0f;
+            for (size_t j = 0; j < model->weights.col; ++j) {
+                sum += X_work->data[i * X_work->stride + j] * model->weights.data[j];
+            }
+            linear_preds[i] = sum;
+        }
+
+        /*
         mat_status_t status = matvecmul(&linear_preds_mat, X_work->data, model->weights.data);
         if (status != MATRIX_SUCCESS) {
             return LOGISTIC_MEMORY_ERROR;
-        }
+        } */
+        
         
         // Apply sigmoid to get probabilities
         compute_sigmoid(linear_preds, probs, num_samples);
+
         
         return LOGISTIC_SUCCESS;
     }
