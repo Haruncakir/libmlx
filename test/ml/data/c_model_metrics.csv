@@ -1,0 +1,13 @@
+metric,value
+training_time,0.005987
+memory_usage_mb,0.01
+memory_init_mb,3.89
+memory_training_mb,0.00
+memory_prediction_mb,0.00
+total_memory_mb,3.89
+accuracy,0.650000
+log_loss,0.627322
+iterations,5000
+intercept,-0.302702
+weight_1,-0.611624
+weight_2,0.305180

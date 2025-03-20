@@ -32,8 +32,7 @@ for i, label in enumerate([0, 1]):
         s=100
     )
 
-# Add decision boundary (if you want to visualize a classifier)
-# This is an optional step - commented out for now
+# Add decision boundary (to visualize a classifier)
 """
 # Create a mesh grid to visualize decision boundary
 x_min, x_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
