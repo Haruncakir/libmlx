@@ -56,4 +56,6 @@ dkms.conf
 
 test/exe
 
-test/data_vis
+data_vis
+
+garbage/
