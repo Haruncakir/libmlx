@@ -56,6 +56,7 @@ dkms.conf
 
 test/exe
 
-data_vis
-
 garbage/
+
+py/.venv/
+py/data/
