@@ -114,6 +114,7 @@ np.save("labels.npy", np.array(all_labels))
 
 # --------------------- Save Model ---------------------
 torch.save(model.state_dict(), "visnet_model.pth")
+torch.save(model, "complete_visnet_model.pth")
 
 # --------------------- Plot Loss Curve ---------------------
 plt.plot(range(1, num_epochs+1), train_losses, marker='o')
